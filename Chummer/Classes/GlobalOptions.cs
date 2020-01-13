@@ -101,10 +101,22 @@ namespace Chummer
 		[SavePropertyAs("omaeenabled")]
 		public bool OmaeEnabled { get; set; } = false;
 
-		/// <summary>
-		/// Main application form.
-		/// </summary>
-		[DisplayIgnore]
+        private static bool _blnHideCharts;
+
+        /// <summary>
+        /// Should charts that can cause crash behaviour in Wine be shown
+        /// </summary>
+        [SavePropertyAs("hidecharts")]
+        public bool HideCharts
+        {
+            get => _blnHideCharts;
+            set => _blnHideCharts = value;
+        }
+
+        /// <summary>
+        /// Main application form.
+        /// </summary>
+        [DisplayIgnore]
 		public frmChummerMain MainForm { get; set; }
 
 		private string _strLanguage = "en-us";
@@ -283,17 +295,26 @@ namespace Chummer
 
 
 
-        private bool _blnUseLoggingApplicationInsights;
+        private static UseAILogging _enumUseLoggingApplicationInsights;
+
         /// <summary>
         /// Whether or not the app should use logging.
         /// </summary>
-        public bool UseLoggingApplicationInsights
+        public UseAILogging UseLoggingApplicationInsights
         {
-            get => _blnUseLoggingApplicationInsights;
+            get => _enumUseLoggingApplicationInsights;
             set
             {
-                _blnUseLoggingApplicationInsights = value;
-                TelemetryConfiguration.Active.DisableTelemetry = !value;
+                _enumUseLoggingApplicationInsights = value;
+                // Sets up logging if the option is changed during runtime
+                if (_enumUseLoggingApplicationInsights <= UseAILogging.OnlyLocal)
+                {
+                    TelemetryConfiguration.Active.DisableTelemetry = false;
+                }
+                else
+                {
+                    TelemetryConfiguration.Active.DisableTelemetry = true;
+                }
             }
         }
 

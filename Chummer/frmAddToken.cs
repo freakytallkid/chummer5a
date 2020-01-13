@@ -18,6 +18,7 @@
  */
  using System;
  using System.IO;
+ using System.Threading.Tasks;
  using System.Windows.Forms;
 
 namespace Chummer
@@ -55,7 +56,7 @@ namespace Chummer
         /// Loads the character
         /// </summary>
         /// <param name="fileName"></param>
-        private void LoadCharacter(string fileName)
+        private async Task<bool> LoadCharacter(string fileName)
         {
             if (File.Exists(fileName) && fileName.EndsWith("chum5"))
             {
@@ -64,10 +65,10 @@ namespace Chummer
                 {
                     FileName = fileName
                 };
-                if (!objCharacter.Load())
+                if (!(await objCharacter.Load()))
                 {
                     Cursor = Cursors.Default;   // TODO edward setup error page
-                    return; // we obviously cannot init
+                    return false; // we obviously cannot init
                 }
 
                 nudInit.Value = objCharacter.InitiativeDice;
@@ -76,7 +77,9 @@ namespace Chummer
                     nudInitStart.Value = intTemp;
                 _character = objCharacter;
                 Cursor = Cursors.Default;
+                return true;
             }
+            return false;
         }
 
         /// <summary>
@@ -119,7 +122,7 @@ namespace Chummer
                 int intInitRoll = intInitPasses;
                 for (int j = 0; j < intInitPasses; ++j)
                 {
-                    intInitRoll += GlobalOptions.RandomGenerator.NextD6ModuloBiasRemoved();
+                    intInitRoll += GlobalOptions.Instance.RandomGenerator.NextD6ModuloBiasRemoved();
                 }
                 _character.InitRoll = intInitRoll + _character.InitialInit;
             }

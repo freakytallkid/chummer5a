@@ -13,6 +13,7 @@ using Chummer.Backend.Attributes.OptionAttributes;
 using Chummer.Backend.Options;
 using Chummer.Classes;
 using Chummer.Datastructures;
+using Chummer.Plugins;
 using Chummer.UI.Options;
 using Chummer.UI.Options.ControlGenerators;
 using Microsoft.Win32;
@@ -60,6 +61,10 @@ namespace Chummer
 	        SimpleTree<OptionRenderItem> globalTree = extactor.Extract(GlobalOptions.Instance);
 	        SimpleTree<OptionRenderItem> rawTree = extactor.Extract(o);
 	        rawTree.Children.AddRange(globalTree.Children);
+            if (GlobalOptions.Instance.PluginsEnabled)
+            {
+                Program.PluginLoader.LoadPlugins(null);
+            }
 	        _options = new OptionCollectionCache(rawTree, temp, controlFactories);
 	        _winformTree = GenerateWinFormTree(rawTree);
 	        _winformTree.Children.Add(new BookNode(_options));

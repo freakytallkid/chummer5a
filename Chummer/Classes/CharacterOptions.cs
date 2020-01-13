@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Xml;
 using Chummer.Annotations;
@@ -163,12 +165,12 @@ namespace Chummer
 			}
 			strPath = strPath.Substring(0, strPath.Length - 4) + ")";
 
-			if (GlobalOptions.MissionsOnly)
+			if (GlobalOptions.Instance.MissionsOnly)
 			{
 				strPath += " and not(nomission)";
 			}
 
-			if (!GlobalOptions.Dronemods)
+			if (!GlobalOptions.Instance.Dronemods)
 			{
 				strPath += " and not(optionaldrone)";
 			}
@@ -879,7 +881,7 @@ namespace Chummer
 	    /// <summary>
 	    /// Sourcebooks.
 	    /// </summary>
-	    public Dictionary<string, bool> Books { get; } = GlobalOptions.SourcebookInfo.ToDictionary(x => x.Code, x => x.Code == "SR5");
+	    public Dictionary<string, bool> Books { get; } = GlobalOptions.Instance.SourcebookInfo.ToDictionary(x => x.Code, x => x.Code == "SR5");
 
 	    public IEnumerable<string> EnabledBooks()
 	    {
@@ -1102,6 +1104,10 @@ namespace Chummer
 
         public bool DronemodsMaximumPilot { get; set; }
 
+        /// <summary>
+        /// TODO: This should be called somewhere!
+        /// </summary>
+        public Action<object, PropertyChangedEventArgs> PropertyChanged { get; internal set; }
     }
 
     public enum LimbCount

@@ -436,6 +436,23 @@ namespace Chummer
             }
         }
 
+        public string RatingLabel
+        {
+            get
+            {
+                switch (EntityType)
+                {
+                    case SpiritType.Spirit:
+                        return "String_Force";
+                    case SpiritType.Sprite:
+                        return "String_Level";
+                    default:
+                        return "String_Rating";
+                }
+            }
+        }
+
+
         /// <summary>
         /// Number of Services the Spirit owes.
         /// </summary>
@@ -706,7 +723,7 @@ namespace Chummer
 
         public XmlNode GetNode(string strLanguage)
         {
-            if (_objCachedMyXmlNode == null || strLanguage != _strCachedXmlNodeLanguage || GlobalOptions.LiveCustomData)
+            if (_objCachedMyXmlNode == null || strLanguage != _strCachedXmlNodeLanguage || GlobalOptions.Instance.LiveCustomData)
             {
                 _objCachedMyXmlNode = XmlManager.Load(_eEntityType == SpiritType.Spirit ? "traditions.xml" : "streams.xml", strLanguage).SelectSingleNode($"/chummer/spirits/spirit[name = \"{Name}\"]");
                 _strCachedXmlNodeLanguage = strLanguage;
@@ -718,7 +735,7 @@ namespace Chummer
 
         public bool NoLinkedCharacter => _objLinkedCharacter == null;
 
-        public void RefreshLinkedCharacter(bool blnShowError)
+        public async void RefreshLinkedCharacter(bool blnShowError)
         {
             Character objOldLinkedCharacter = _objLinkedCharacter;
             CharacterObject.LinkedCharacters.Remove(_objLinkedCharacter);
@@ -738,7 +755,7 @@ namespace Chummer
 
                 if (blnError && blnShowError)
                 {
-                    MessageBox.Show(string.Format(LanguageManager.GetString("Message_FileNotFound", GlobalOptions.Language), FileName),
+                    Program.MainForm.ShowMessageBox(string.Format(LanguageManager.GetString("Message_FileNotFound", GlobalOptions.Language), FileName),
                         LanguageManager.GetString("MessageTitle_FileNotFound", GlobalOptions.Language), MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
@@ -748,7 +765,7 @@ namespace Chummer
                 if (strFile.EndsWith(".chum5"))
                 {
                     Character objOpenCharacter = Program.MainForm.OpenCharacters.FirstOrDefault(x => x.FileName == strFile);
-                    _objLinkedCharacter = objOpenCharacter ?? Program.MainForm.LoadCharacter(strFile, string.Empty, false, false);
+                    _objLinkedCharacter = objOpenCharacter ?? (await Program.MainForm.LoadCharacter(strFile, string.Empty, false, false));
                     if (_objLinkedCharacter != null)
                         CharacterObject.LinkedCharacters.Add(_objLinkedCharacter);
                 }
